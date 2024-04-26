@@ -1,5 +1,8 @@
 # sans-index-generator
 Generate Indexes from SANS PDFs
+
+> NOTE: May not work with all SANS PDFs due to different structures. Modify the `fix_text` and `extract_pdf_text` methods in `extractpdfs.py` to match the structure of the PDFs you are working with if errors occur.
+
 ```bash
 usage: extractpdfs.py [-h] [-P PASSWORD] [-O OUT] [--maxwidth MAXWIDTH]
                       [--only-page-order] [--only-alpha]
