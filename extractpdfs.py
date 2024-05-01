@@ -66,7 +66,6 @@ def extract_pdf_text(filename, password=None):
 
         if not header:
             header = f'UNKNOWN HEADER - {lines[0]}'
-            # lines[0]
 
         text = fix_text(text)
         header = fix_text(header)
@@ -141,7 +140,7 @@ def print_index_by_alpha_order(index, stream=None, maxwidth=80):
 def main():
     parser = argparse.ArgumentParser(
         description='Extracts indexes from SANS PDF files.')
-    parser.add_argument('FILENAMES', metavar='FILENAMES', type=str, nargs='*', default=[],
+    parser.add_argument('FILENAMES', metavar='FILENAMES', type=str, nargs='*', default=["560/SEC560-Book1.pdf"],
                         help='the PDF files to unlock and extract indexes from')
     parser.add_argument("-P", '--password', dest='PASSWORD', required=False, type=str, default=None,
                         help='the password to unlock the PDF files')
@@ -172,6 +171,9 @@ def main():
                         default=None, help='Save index to file')
 
     args = parser.parse_args()
+
+    if not args.FILENAMES and not args.load_index:
+        parser.error("No PDF files specified")
 
     if args.only_page_order and args.only_alpha:
         parser.error("Cannot use both --only-page-order and --only-alpha")
@@ -210,3 +212,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+    x = 'foo'
+    if x.startswith('foo') or x.startswith('bar') or x.startswith('baz'):
+        print('pixee test')
