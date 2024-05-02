@@ -10,12 +10,11 @@ from PyPDF2 import PdfReader
 
 
 def fix_text(text):
-    text = re.sub(r"\bT\s", "T", text)
-    text = text.replace('  ', ' ')
-    text = text.replace('\t', ' ')
+    text = re.sub(r"\b([TY])\s", r"\1", text)
+    text = re.sub(r'[\t ]+', ' ', text)
+    text = text.replace('Secu rity', 'Security')
     text = text.strip()
     return text
-
 
 def extract_pdf_text(filename, password=None):
     pages = {}
@@ -23,9 +22,12 @@ def extract_pdf_text(filename, password=None):
     pdf._flatten()
 
     cover, terms_page = list(pdf.pages)[0:2]
+    cover_lines = cover.extract_text().split('\n')
+    course_title = cover_lines.pop(0).split('sans.org')[1].replace(' & ', ' and ')
+    while not (next_line := cover_lines.pop(0)).startswith('GIAC'):
+        course_title += ' ' + next_line
+    course_title = fix_text(course_title)
 
-    course_title = cover.extract_text().split('\n')[0].split('sans.org')[
-        1].replace('  ', ' ').strip()
     course_code, course_name = course_title.split(' | ', 1)
     authors = terms_page.extract_text().split('.')[0]
 
@@ -36,6 +38,7 @@ def extract_pdf_text(filename, password=None):
 
         text = page.extract_text()
         text = text.split(authors)[0]
+        text = fix_text(text)
         references = re.search(
             r'References:\n?(?:\[\d+\].+\n?)+', text, flags=re.MULTILINE)
         if references:
@@ -67,7 +70,6 @@ def extract_pdf_text(filename, password=None):
         if not header:
             header = f'UNKNOWN HEADER - {lines[0]}'
 
-        text = fix_text(text)
         header = fix_text(header)
         pages[page_num] = (header, text, references)
         print(f"Read {filename} Page {page_num}: {header}", file=stderr)
@@ -87,7 +89,7 @@ def make_index(file_pages, keep_roadmap=False, keep_toc=False, keep_continuation
                 continue
             if not keep_continuation and header.endswith('(CONT)'):
                 continue
-            if not keep_summary and header.startswith('Summary'):
+            if not keep_summary and header.startswith('Summary') or header.startswith('Module Summary'):
                 continue
             if not keep_labs and header.startswith('Lab') or header.startswith('Please work on'):
                 continue
@@ -140,14 +142,14 @@ def print_index_by_alpha_order(index, stream=None, maxwidth=80):
 def main():
     parser = argparse.ArgumentParser(
         description='Extracts indexes from SANS PDF files.')
-    parser.add_argument('FILENAMES', metavar='FILENAMES', type=str, nargs='*', default=["560/SEC560-Book1.pdf"],
+    parser.add_argument('FILENAMES', metavar='FILENAMES', type=str, nargs='*', default=[],
                         help='the PDF files to unlock and extract indexes from')
     parser.add_argument("-P", '--password', dest='PASSWORD', required=False, type=str, default=None,
                         help='the password to unlock the PDF files')
 
     parser.add_argument('-O', '--out', type=str,
                         default=None, help='Output file')
-    parser.add_argument('--maxwidth', type=int, default=80,
+    parser.add_argument('--maxwidth', type=int, default=120,
                         help='Maximum width of output')
     parser.add_argument('--only-page-order',
                         action='store_true', help='Print index only in page order')
