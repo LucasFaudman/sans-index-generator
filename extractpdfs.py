@@ -212,6 +212,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-    x = 'foo'
-    if x.startswith(('foo', 'bar')) or x.startswith('baz'):
-        print('pixee test')
