@@ -1,8 +1,15 @@
 # sans-index-generator
-Generate Indexes from SANS PDFs
+**Generate Indexes from SANS PDFs**
 
 > NOTE: May not work with all SANS PDFs due to different structures. Modify the `fix_text` and `extract_pdf_text` methods in `extractpdfs.py` to match the structure of the PDFs you are working with if errors occur.
 
+## Setup
+Run the following command to clone the repository and run the setup script.
+```bash
+git clone https://github.com/LucasFaudman/sans-index-generator && cd sans-index-generator && chmod +x setup.sh && ./setup.sh
+```
+
+## Usage
 ```bash
 usage: extractpdfs.py [-h] [-P PASSWORD] [-O OUT] [--maxwidth MAXWIDTH]
                       [--only-page-order] [--only-alpha]
@@ -43,7 +50,7 @@ optional arguments:
                         Save index to file
 ```
 
-### Example Output
+## Example Output
 ```
 560/SEC560-Book1.pdf:
 

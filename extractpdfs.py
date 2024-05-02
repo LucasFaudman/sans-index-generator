@@ -1,10 +1,11 @@
 import argparse
 import re
 import json
-from pathlib import Path
-from collections import defaultdict, OrderedDict
-from concurrent.futures import ProcessPoolExecutor
 from sys import stdout, stderr
+from pathlib import Path
+from collections import defaultdict
+from concurrent.futures import ProcessPoolExecutor
+
 from textwrap import TextWrapper
 from PyPDF2 import PdfReader
 
@@ -83,7 +84,7 @@ def make_index(file_pages, keep_roadmap=False, keep_toc=False, keep_continuation
     index = defaultdict(dict)
     for filename, pages in file_pages.items():
         for page_num, (header, text, references) in pages.items():
-            if not keep_roadmap and header in ["Course Roadmap", "Course Outline"]:
+            if not keep_roadmap and header.startswith(("Course Roadmap", "Course Outline")):
                 continue
             if not keep_toc and header == "TABLE OF CONTENTS":
                 continue
@@ -122,7 +123,7 @@ def print_index_by_alpha_order(index, stream=None, maxwidth=80):
 
     def sort_fn(x): return x[0].replace(
         'The ', '', 1).replace('A ', '', 1).lower()
-    alpha_index = OrderedDict(sorted(alpha_index.items(), key=sort_fn))
+    alpha_index = dict(sorted(alpha_index.items(), key=sort_fn))
     max_pagestr_len = max(len(": " + ','.join(page_nums))
                           for page_nums in alpha_index.values())
 
