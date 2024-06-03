@@ -1,1 +1,2 @@
 PyPDF2
+pycryptodome
